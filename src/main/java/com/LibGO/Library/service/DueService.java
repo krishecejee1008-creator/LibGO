@@ -1,11 +1,15 @@
 package com.LibGO.Library.service;
 
 import com.LibGO.Library.exception.LibGOException;
-import com.LibGO.Library.exception.NoOverDueException;
+import com.LibGO.Library.exception.IssueNotOverDueException;
+import com.LibGO.Library.exception.OverDueNotFoundException;
+import com.LibGO.Library.model.Book;
 import com.LibGO.Library.model.Due;
 import com.LibGO.Library.model.Issue;
 import com.LibGO.Library.model.User;
+import com.LibGO.Library.repository.BookRepository;
 import com.LibGO.Library.repository.DueRepository;
+import com.LibGO.Library.repository.IssueRepository;
 import com.LibGO.Library.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,10 +23,14 @@ public class DueService {
     private DueRepository dueRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private BookRepository bookRepository;
+    @Autowired
+    private IssueRepository issueRepository;
 
     public Due createDue(User user, Issue issue) throws LibGOException {
 
-        if (!LocalDateTime.now().isAfter(issue.getDueDate())) throw new NoOverDueException("Issue is not Over Due");
+        if (!LocalDateTime.now().isAfter(issue.getDueDate())) throw new IssueNotOverDueException("Issue is not Over Due");
 
         Due due = new Due();
 
@@ -37,7 +45,29 @@ public class DueService {
 
         return dueRepository.save(due);
 
+    }
 
+    public Due clearDue(Long id) throws LibGOException{
+
+        Due due = dueRepository.findById(id).orElseThrow(()-> new OverDueNotFoundException("No overdue Found"));
+
+        due.setClearedByAdmin(true);
+        due.setReturnDate(LocalDateTime.now());
+
+        User user = due.getDueIssuer();
+        user.setActive(true);
+
+        userRepository.save(user);
+
+        Issue issue = due.getOverDue();
+        issue.setCurrentStatus(Issue.CurrentStatus.RETURNED);
+        Book book = issue.getBookIssued();
+        book.setAvailableCopies(book.getAvailableCopies()+1);
+
+        bookRepository.save(book);
+        issueRepository.save(issue);
+
+        return dueRepository.save(due);
 
     }
 

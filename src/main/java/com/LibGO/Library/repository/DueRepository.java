@@ -4,4 +4,5 @@ import com.LibGO.Library.model.Due;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DueRepository extends JpaRepository<Due,Long> {
+    Long id(long id);
 }

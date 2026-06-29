@@ -1,8 +1,8 @@
 package com.LibGO.Library.exception;
 
-public class NoOverDueException extends LibGOException{
+public class IssueNotOverDueException extends LibGOException{
 
-    public NoOverDueException(String message){
+    public IssueNotOverDueException(String message){
 
         super(message);
 
