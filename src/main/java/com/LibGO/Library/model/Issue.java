@@ -26,6 +26,7 @@ public class Issue {
         EXPIRED
     }
 
+    @Enumerated(EnumType.STRING)
     private CurrentStatus currentStatus;
     private boolean isCollected;
     private  LocalDateTime collectedAt;

@@ -25,6 +25,7 @@ public class Book{
         GENERAL
     }
 
+    @Enumerated(EnumType.STRING)
    private Genre genre;
    private String author;
    private int totalCopies;

@@ -21,6 +21,8 @@ public class User{
         STAFF,
         ADMIN
     }
+
+    @Enumerated(EnumType.STRING)
     private UserType userType;
     private LocalDateTime joinedAt;
 
