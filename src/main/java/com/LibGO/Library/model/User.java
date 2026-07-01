@@ -14,7 +14,8 @@ public class User{
     private String collageEmailID;
     private Long enrollmentID;
     private String name;
-    private boolean isActive;
+    private Boolean isActive;
+    private String password;
     public enum UserType{
         STUDENT,
         FACULTY,
@@ -30,7 +31,7 @@ public class User{
         this.id = id;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Boolean active) {
         isActive = active;
     }
 
@@ -70,7 +71,7 @@ public class User{
         return joinedAt;
     }
 
-    public boolean isActive() {
+    public Boolean isActive() {
         return isActive;
     }
 
@@ -80,5 +81,13 @@ public class User{
 
     public String getName() {
         return name;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

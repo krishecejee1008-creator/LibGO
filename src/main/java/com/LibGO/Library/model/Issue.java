@@ -28,9 +28,9 @@ public class Issue {
 
     @Enumerated(EnumType.STRING)
     private CurrentStatus currentStatus;
-    private boolean isCollected;
+    private Boolean isCollected;
     private  LocalDateTime collectedAt;
-    private boolean isExtended;
+    private Boolean isExtended;
     private LocalDateTime extendedAt;
 
     public void setId(long id) {
@@ -82,7 +82,7 @@ public class Issue {
         return bookIssued;
     }
 
-    public void setCollected(boolean collected) {
+    public void setCollected(Boolean collected) {
         isCollected = collected;
     }
 
@@ -90,7 +90,7 @@ public class Issue {
         this.collectedAt = collectedAt;
     }
 
-    public void setExtended(boolean extended) {
+    public void setExtended(Boolean extended) {
         isExtended = extended;
     }
 
@@ -102,11 +102,11 @@ public class Issue {
         return collectedAt;
     }
 
-    public boolean isCollected() {
+    public Boolean isCollected() {
         return isCollected;
     }
 
-    public boolean isExtended() {
+    public Boolean isExtended() {
         return isExtended;
     }
 

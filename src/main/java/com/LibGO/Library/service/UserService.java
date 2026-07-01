@@ -22,6 +22,25 @@ public class UserService {
     }
 
     public Optional<User> getUserByEmail(String email){
+
         return userRepository.findByCollageEmailID(email);
+
+    }
+
+    public Optional<User> getUserById(Long id){
+
+        return userRepository.findById(id);
+    }
+
+    public Optional<User> getUserByEnrollmentID(Long enrollmentId){
+
+        return userRepository.findByEnrollmentID(enrollmentId);
+
+    }
+
+    public Optional<User> getUserByName(String name){
+
+        return userRepository.findByName(name);
+
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -48,6 +49,7 @@ public class IssueService {
         issue.setIssueDateTime(LocalDateTime.now());
         issue.setCurrentStatus(Issue.CurrentStatus.PENDING);
         issue.setCollected(false);
+        issue.setExtended(false);
 
         book.setAvailableCopies(book.getAvailableCopies() - 1);
 
@@ -99,6 +101,18 @@ public class IssueService {
         bookRepository.save(book);
 
         return issueRepository.save(issue);
+
+    }
+
+    public List<Issue> getAllActiveIssues(){
+
+        return issueRepository.findByCurrentStatus(Issue.CurrentStatus.ACTIVE);
+
+    }
+
+    public List<Issue> getAllPendingIssues(){
+
+        return issueRepository.findByCurrentStatus(Issue.CurrentStatus.PENDING);
 
     }
 

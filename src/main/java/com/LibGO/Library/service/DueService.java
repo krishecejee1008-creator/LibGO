@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class DueService {
@@ -68,6 +69,12 @@ public class DueService {
         issueRepository.save(issue);
 
         return dueRepository.save(due);
+
+    }
+
+    public List<Due> getAllDues(){
+
+        return dueRepository.findAll();
 
     }
 

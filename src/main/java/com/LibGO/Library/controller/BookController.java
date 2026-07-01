@@ -26,12 +26,22 @@ public class BookController {
         return bookService.getBookById(id);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/searchBookByName")
     public Optional<Book> getBookByName(@RequestParam String name){
-        return bookService.searchByName(name);
+        return bookService.searchBookByName(name);
     }
 
-    @PostMapping
+    @GetMapping("/searchBookByAuthor")
+    public Optional<Book> getBookByAuthor(@RequestParam String name){
+        return bookService.searchBookByAuthor(name);
+    }
+
+    @GetMapping("/searchBookByGenre")
+    public Optional<Book> getBookByGenre(@RequestParam Book.Genre genre){
+        return bookService.searchBookByGenre(genre);
+    }
+
+    @PostMapping("/addBooks")
     public Book addBook(@RequestBody Book book){
         return bookService.addBook(book);
     }

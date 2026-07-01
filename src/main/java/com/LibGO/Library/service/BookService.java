@@ -23,9 +23,21 @@ public class BookService {
 
     }
 
-    public Optional<Book> searchByName(String name){
+    public Optional<Book> searchBookByName(String name){
 
         return bookRepository.findByName(name);
+    }
+
+    public Optional<Book> searchBookByGenre(Book.Genre genre){
+
+        return bookRepository.findByGenre(genre);
+
+    }
+
+    public Optional<Book> searchBookByAuthor(String name){
+
+        return bookRepository.findByAuthor(name);
+
     }
 
     public List<Book> getAllBooks(){
