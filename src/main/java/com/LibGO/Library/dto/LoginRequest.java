@@ -1,8 +1,10 @@
 package com.LibGO.Library.dto;
 
+import com.LibGO.Library.model.User;
+
 public class LoginRequest {
-    String collageEmailId;
-    String password;
+    private String collageEmailId;
+    private String password;
 
     public void setCollageEmailId(String collageEmailId) {
         this.collageEmailId = collageEmailId;

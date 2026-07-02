@@ -56,7 +56,7 @@ public class UserController {
         User user = userService.getUserByEmail(loginRequest.getCollageEmailId()).orElseThrow(()-> new UserNotAvailableException("User Not Found"));
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) throw new InvalidPasswordException("Password entered is Wrong");
 
-        return jwtUtil.generateToken(loginRequest.getCollageEmailId());
+        return jwtUtil.generateToken(loginRequest.getCollageEmailId(), user.getUserType());
 
     }
 }
