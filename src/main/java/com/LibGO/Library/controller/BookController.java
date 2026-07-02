@@ -32,18 +32,13 @@ public class BookController {
     }
 
     @GetMapping("/searchBookByAuthor")
-    public Optional<Book> getBookByAuthor(@RequestParam String name){
+    public List<Book> getBookByAuthor(@RequestParam String name){
         return bookService.searchBookByAuthor(name);
     }
 
     @GetMapping("/searchBookByGenre")
-    public Optional<Book> getBookByGenre(@RequestParam Book.Genre genre){
+    public List<Book> getBookByGenre(@RequestParam Book.Genre genre){
         return bookService.searchBookByGenre(genre);
-    }
-
-    @PostMapping("/addBooks")
-    public Book addBook(@RequestBody Book book){
-        return bookService.addBook(book);
     }
 
 }

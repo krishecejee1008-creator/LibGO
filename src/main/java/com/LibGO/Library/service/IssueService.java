@@ -35,7 +35,7 @@ public class IssueService {
         }
 
         if (!user.isActive()) {
-            throw new UserBlockException("You," + user.getName() + ", your book," + book.getName() + ", is due. Return to continue issuing, Thank you!");
+            throw new UserBlockException("You," + user.getFirstName() + ", your book," + book.getName() + ", is due. Return to continue issuing, Thank you!");
         }
 
         if (findByBookAndIssuer(user, book).isPresent()) {
@@ -113,6 +113,12 @@ public class IssueService {
     public List<Issue> getAllPendingIssues(){
 
         return issueRepository.findByCurrentStatus(Issue.CurrentStatus.PENDING);
+
+    }
+
+    public List<Issue> myBooks(User issuer){
+
+        return issueRepository.findIssueByIssuer(issuer);
 
     }
 

@@ -1,7 +1,9 @@
 package com.LibGO.Library.controller;
 
 import com.LibGO.Library.dto.IssueRequest;
+import com.LibGO.Library.exception.BookNotAvailableException;
 import com.LibGO.Library.exception.LibGOException;
+import com.LibGO.Library.exception.UserNotAvailableException;
 import com.LibGO.Library.model.Book;
 import com.LibGO.Library.model.Issue;
 import com.LibGO.Library.model.User;
@@ -26,10 +28,10 @@ public class IssueController {
     IssueService issueService;
 
     @PostMapping("/issueHere")
-    public ResponseEntity<?> createIssue(@RequestBody IssueRequest request){
+    public ResponseEntity<?> createIssue(@RequestBody IssueRequest request) throws LibGOException{
         try {
-            User user = userService.getUserById(request.getUserId()).get();
-            Book book = bookService.getBookById(request.getBookId()).get();
+            User user = userService.getUserById(request.getUserId()).orElseThrow(()-> new UserNotAvailableException("Invalid UserID"));
+            Book book = bookService.getBookById(request.getBookId()).orElseThrow(()-> new BookNotAvailableException("Invalid BookID"));
 
             Issue issue = issueService.createIssue(user, book);
 
@@ -43,8 +45,8 @@ public class IssueController {
     @PutMapping("/collect")
     public ResponseEntity<?> collectIssue(@RequestBody IssueRequest request){
         try {
-            User user = userService.getUserById(request.getUserId()).get();
-            Book book = bookService.getBookById(request.getBookId()).get();
+            User user = userService.getUserById(request.getUserId()).orElseThrow(()-> new UserNotAvailableException("Invalid UserID"));
+            Book book = bookService.getBookById(request.getBookId()).orElseThrow(()-> new BookNotAvailableException("Invalid BookID"));
 
             Issue issue = issueService.collectBook(user, book);
 
@@ -59,8 +61,8 @@ public class IssueController {
     @PutMapping("/extend")
     public ResponseEntity<?> extendIssue(@RequestBody IssueRequest request){
         try {
-            User user = userService.getUserById(request.getUserId()).get();
-            Book book = bookService.getBookById(request.getBookId()).get();
+            User user = userService.getUserById(request.getUserId()).orElseThrow(()-> new UserNotAvailableException("Invalid UserID"));
+            Book book = bookService.getBookById(request.getBookId()).orElseThrow(()-> new BookNotAvailableException("Invalid BookID"));
 
             Issue issue = issueService.extendIssue(user, book);
 
@@ -73,10 +75,10 @@ public class IssueController {
     }
 
     @PutMapping("/cancel")
-    public ResponseEntity<?> cancelIssue(@RequestBody IssueRequest request){
+    public ResponseEntity<?> cancelIssue(@RequestBody IssueRequest request) throws LibGOException{
         try {
-            User user = userService.getUserById(request.getUserId()).get();
-            Book book = bookService.getBookById(request.getBookId()).get();
+            User user = userService.getUserById(request.getUserId()).orElseThrow(()-> new UserNotAvailableException("Invalid UserID"));
+            Book book = bookService.getBookById(request.getBookId()).orElseThrow(()-> new BookNotAvailableException("Invalid BookID"));
 
             Issue issue = issueService.cancelIssue(user, book);
 

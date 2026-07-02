@@ -1,6 +1,7 @@
 package com.LibGO.Library.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -13,8 +14,11 @@ public class User{
     private Long id;
     private String collageEmailID;
     private Long enrollmentID;
-    private String name;
+    private String firstName;
+    private String lastName;
     private Boolean isActive;
+
+    @JsonIgnore
     private String password;
     public enum UserType{
         STUDENT,
@@ -23,6 +27,21 @@ public class User{
         ADMIN
     }
 
+    private Long jeeApplicationNumber;
+    public enum Branch{
+        CSE,
+        IT,
+        ECE,
+        IOT,
+        EE,
+        ME,
+        CHE,
+        BPHARM
+    }
+
+    @Enumerated(EnumType.STRING)
+    private Branch branch;
+    private Boolean isNewAdmission;
     @Enumerated(EnumType.STRING)
     private UserType userType;
     private LocalDateTime joinedAt;
@@ -51,6 +70,14 @@ public class User{
         this.collageEmailID = collageEmailID;
     }
 
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
     public String getCollageEmailID(){
         return collageEmailID;
     }
@@ -75,12 +102,12 @@ public class User{
         return isActive;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String name) {
+        this.firstName = name;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
     public void setPassword(String password) {
@@ -90,4 +117,34 @@ public class User{
     public String getPassword() {
         return password;
     }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setBranch(Branch branch) {
+        this.branch = branch;
+    }
+
+    public void setJeeApplicationNumber(Long jeeApplicationNumber) {
+        this.jeeApplicationNumber = jeeApplicationNumber;
+    }
+
+    public void setNewAdmission(Boolean newAdmission) {
+        isNewAdmission = newAdmission;
+    }
+
+    public Boolean getNewAdmission() {
+        return isNewAdmission;
+    }
+
+    public Branch getBranch() {
+        return branch;
+    }
+
+    public Long getJeeApplicationNumber() {
+        return jeeApplicationNumber;
+    }
+
+
 }

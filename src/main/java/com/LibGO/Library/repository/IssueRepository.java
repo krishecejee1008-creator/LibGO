@@ -11,5 +11,10 @@ import java.util.Optional;
 public interface IssueRepository extends JpaRepository<Issue, Long> {
 
     Optional<Issue> findByIssuerAndBookIssued(User issuer, Book bookIssued);
+
     List<Issue> findByCurrentStatus(Issue.CurrentStatus currentStatus);
+
+    List<Issue> findIssueByIssuer(User issuer);
+
+    User findIssueById(long id);
 }

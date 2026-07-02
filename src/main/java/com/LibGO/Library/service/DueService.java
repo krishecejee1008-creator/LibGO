@@ -78,4 +78,10 @@ public class DueService {
 
     }
 
+    public List<Due> myDue(User dueIssuer){
+
+        return dueRepository.findDueByDueIssuer(dueIssuer);
+
+    }
+
 }

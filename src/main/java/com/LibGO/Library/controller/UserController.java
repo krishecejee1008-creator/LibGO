@@ -1,10 +1,17 @@
 package com.LibGO.Library.controller;
 
+import com.LibGO.Library.exception.LibGOException;
+import com.LibGO.Library.exception.UserNotAvailableException;
+import com.LibGO.Library.model.Due;
+import com.LibGO.Library.model.Issue;
 import com.LibGO.Library.model.User;
+import com.LibGO.Library.service.DueService;
+import com.LibGO.Library.service.IssueService;
 import com.LibGO.Library.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -13,33 +20,27 @@ public class UserController {
 
     @Autowired
     UserService userService;
+    @Autowired
+    private IssueService issueService;
+    @Autowired
+    private DueService dueService;
 
-    @GetMapping("/searchUserByEmail")
-    public Optional<User> getByEmail(@RequestParam String email){
+    @GetMapping("/myBooks")
+    public List<Issue> myBooks(@RequestParam Long userId) throws LibGOException{
 
-        return userService.getUserByEmail(email);
-
-    }
-
-    @GetMapping("/searchUserByEnrollmentId")
-    public Optional<User> getByEnrollmentId(@RequestParam Long enrollmentId){
-
-        return userService.getUserByEnrollmentID(enrollmentId);
+        User user = userService.getUserById(userId).orElseThrow(()-> new UserNotAvailableException("Invalid UserID"));
+        return issueService.myBooks(user);
 
     }
 
-    @GetMapping("/searchUserByName")
-    public Optional<User> getByName(@RequestParam String name){
+    @GetMapping("/myDues")
+    public List<Due> myDues(@RequestParam Long userID) throws LibGOException {
 
-        return userService.getUserByName(name);
-
-    }
-
-    @PostMapping("/register")
-    public User registerNewUser(@RequestBody User user){
-
-        return userService.registerUser(user);
+        User user = userService.getUserById(userID).orElseThrow(()-> new UserNotAvailableException("Invalid User ID"));
+        return dueService.myDue(user);
 
     }
+
+
 
 }
