@@ -1,7 +1,5 @@
 package com.LibGO.Library.dto;
 
-import com.LibGO.Library.model.User;
-
 public class LoginRequest {
     private String collageEmailId;
     private String password;

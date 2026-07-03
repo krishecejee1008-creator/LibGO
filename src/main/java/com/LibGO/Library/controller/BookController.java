@@ -1,7 +1,6 @@
 package com.LibGO.Library.controller;
 
 import com.LibGO.Library.model.Book;
-import com.LibGO.Library.repository.BookRepository;
 import com.LibGO.Library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
