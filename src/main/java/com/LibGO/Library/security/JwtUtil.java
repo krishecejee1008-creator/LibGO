@@ -11,10 +11,10 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    @Value("${jwt.secret}")
+    @Value("${libgo.token.key}")
     private String secretKey;
 
-    @Value("${jwt.expiration}")
+    @Value("${libgo.token.expiry}")
     private Long expiration;
 
     private SecretKey getSigningKey(){
