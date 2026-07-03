@@ -2,7 +2,6 @@ package com.LibGO.Library.scheduler;
 
 import com.LibGO.Library.exception.LibGOException;
 import com.LibGO.Library.model.Book;
-import com.LibGO.Library.model.Due;
 import com.LibGO.Library.model.Issue;
 import com.LibGO.Library.repository.IssueRepository;
 import com.LibGO.Library.service.BookService;
