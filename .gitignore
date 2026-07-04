@@ -34,4 +34,3 @@ build/
 
 ### Sensitive config ###
 src/main/resources/application.properties
-src/main/resources/application-prod.properties
