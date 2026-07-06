@@ -12,6 +12,7 @@ import com.LibGO.Library.service.DueService;
 import com.LibGO.Library.service.IssueService;
 import com.LibGO.Library.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,4 +59,12 @@ public class UserController {
         return jwtUtil.generateToken(loginRequest.getCollageEmailId(), user.getUserType());
 
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe(@RequestParam String email) throws LibGOException {
+        User user = userService.getUserByEmail(email)
+                .orElseThrow(() -> new UserNotAvailableException("User not found"));
+        return ResponseEntity.ok(user);
+    }
+
 }
