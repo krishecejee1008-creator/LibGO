@@ -38,8 +38,12 @@ public class IssueService {
             throw new UserBlockException("You," + user.getFirstName() + ", your book," + book.getName() + ", is due. Return to continue issuing, Thank you!");
         }
 
-        if (findByBookAndIssuer(user, book).isPresent()) {
-            throw new BookAlreadyIssuedException("The Book, " + book.getName() + ", is already issued");
+        Optional<Issue> existingIssue = findByBookAndIssuer(user, book);
+        if (existingIssue.isPresent()) {
+            Issue.CurrentStatus status = existingIssue.get().getCurrentStatus();
+            if (status == Issue.CurrentStatus.PENDING || status == Issue.CurrentStatus.ACTIVE) {
+                throw new BookAlreadyIssuedException("The Book, " + book.getName() + ", is already issued");
+            }
         }
 
         Issue issue = new Issue();
