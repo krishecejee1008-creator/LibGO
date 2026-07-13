@@ -39,24 +39,30 @@ public class IssueService {
         }
 
         Optional<Issue> existingIssue = findByBookAndIssuer(user, book);
+        Issue issue;
+
         if (existingIssue.isPresent()) {
             Issue.CurrentStatus status = existingIssue.get().getCurrentStatus();
             if (status == Issue.CurrentStatus.PENDING || status == Issue.CurrentStatus.ACTIVE) {
                 throw new BookAlreadyIssuedException("The Book, " + book.getName() + ", is already issued");
             }
+            // Reuse expired/returned issue
+            issue = existingIssue.get();
+            issue.setDueDate(null);
+            issue.setCollectedAt(null);
+        } else {
+            // Create new issue
+            issue = new Issue();
+            issue.setIssuer(user);
+            issue.setBookIssued(book);
         }
 
-        Issue issue = new Issue();
-
-        issue.setIssuer(user);
-        issue.setBookIssued(book);
         issue.setIssueDateTime(LocalDateTime.now());
         issue.setCurrentStatus(Issue.CurrentStatus.PENDING);
         issue.setCollected(false);
         issue.setExtended(false);
 
         book.setAvailableCopies(book.getAvailableCopies() - 1);
-
         bookRepository.save(book);
         return issueRepository.save(issue);
     }
