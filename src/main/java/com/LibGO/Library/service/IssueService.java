@@ -133,5 +133,19 @@ public class IssueService {
 
     }
 
+    public Issue returnBook(User user, Book book) throws LibGOException {
+        Issue issue = findByBookAndIssuer(user, book)
+                .orElseThrow(() -> new InvalidIssueStateException("Issue Not Found"));
+
+        if (!issue.getCurrentStatus().equals(Issue.CurrentStatus.ACTIVE))
+            throw new InvalidIssueStateException("Book is not currently active");
+
+        issue.setCurrentStatus(Issue.CurrentStatus.RETURNED);
+        book.setAvailableCopies(book.getAvailableCopies() + 1);
+
+        bookRepository.save(book);
+        return issueRepository.save(issue);
+    }
+
 }
 

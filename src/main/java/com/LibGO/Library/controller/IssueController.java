@@ -88,5 +88,4 @@ public class IssueController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 }

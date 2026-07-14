@@ -2,6 +2,7 @@ package com.LibGO.Library.controller;
 
 import com.LibGO.Library.dto.IssueRequest;
 import com.LibGO.Library.dto.UpdateUser;
+import com.LibGO.Library.exception.BookNotAvailableException;
 import com.LibGO.Library.exception.LibGOException;
 import com.LibGO.Library.exception.UserNotAvailableException;
 import com.LibGO.Library.model.Book;
@@ -131,6 +132,21 @@ public class AdminController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
+    }
+
+    @PutMapping("/return")
+    public ResponseEntity<?> returnIssue(@RequestBody IssueRequest request) {
+        try {
+            User user = userService.getUserById(request.getUserId())
+                    .orElseThrow(() -> new UserNotAvailableException("Invalid UserID"));
+            Book book = bookService.getBookById(request.getBookId())
+                    .orElseThrow(() -> new BookNotAvailableException("Invalid BookID"));
+
+            Issue issue = issueService.returnBook(user, book);
+            return ResponseEntity.ok(issue);
+        } catch (LibGOException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }
