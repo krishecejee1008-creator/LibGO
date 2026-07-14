@@ -101,13 +101,6 @@ public class AdminController {
 
     }
 
-    @GetMapping("/searchUserByFirstName")
-    public Optional<User> getByFirstName(@RequestParam String name){
-
-        return userService.getUserByFirstName(name);
-
-    }
-
     @PostMapping("/register")
     public User registerNewUser(@RequestBody User user){
 

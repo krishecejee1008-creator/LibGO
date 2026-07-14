@@ -56,12 +56,6 @@ public class UserService {
 
     }
 
-    public Optional<User> getUserByFirstName(String name){
-
-        return userRepository.findByFirstName(name);
-
-    }
-
     public Optional<User> getUserByJeeApplicationNumber(Long jeeApplicationNumber){
 
         return userRepository.findByJeeApplicationNumber(jeeApplicationNumber);
