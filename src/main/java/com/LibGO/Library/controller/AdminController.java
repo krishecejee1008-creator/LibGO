@@ -149,4 +149,9 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/searchUserByJeeApplicationNumber")
+    public Optional<User> getByJeeApplicationNumber(@RequestParam Long jeeApplicationNumber) {
+        return userService.getUserByJeeApplicationNumber(jeeApplicationNumber);
+    }
+
 }

@@ -13,4 +13,5 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findByFirstName(String name);
 
     Optional<User> findByJeeApplicationNumber(Long jeeApplicationNumber);
+
 }
