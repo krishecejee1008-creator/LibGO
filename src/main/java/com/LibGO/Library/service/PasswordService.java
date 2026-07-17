@@ -6,24 +6,26 @@ import com.LibGO.Library.exception.*;
 import com.LibGO.Library.model.User;
 import com.LibGO.Library.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
+
 
 @Service
 public class PasswordService {
+
+    @Value("${resend.api.key}")
+    private String resendApiKey;
 
     @Autowired
     UserRepository userRepository;
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    JavaMailSender javaMailSender;
 
     HashMap<String, String> otpStorage = new HashMap<>();
 
@@ -48,11 +50,16 @@ public class PasswordService {
 
         otpStorage.put(email, otp);
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("LibGO password reset OTP");
-        message.setText("Your OTP is :" + otp + "\nValid for 10 min Only");
-        javaMailSender.send(message);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + resendApiKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String body = "{\"from\":\"LibGO <onboarding@resend.dev>\",\"to\":[\"" + email + "\"],\"subject\":\"LibGO Password Reset OTP\",\"text\":\"Your OTP is: " + otp + "\\nValid for 10 minutes only\"}";
+
+        org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(body, headers);
+        restTemplate.postForObject("https://api.resend.com/emails", entity, String.class);
+
         String otpSent = "OTP sent Successfully";
         return otpSent;
 

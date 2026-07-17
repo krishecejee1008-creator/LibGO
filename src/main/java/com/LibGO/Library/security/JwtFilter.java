@@ -20,6 +20,13 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     JwtUtil jwtUtil;
 
+    // This method explicitly tells Spring Security to skip token validation for our public paths
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        return path.startsWith("/password/") || path.equals("/user/login") || path.equals("/books");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -31,13 +38,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 String email = jwtUtil.extractEmail(token);
                 String roles = jwtUtil.extractRoles(token);
                 SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(roles);
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email,null, List.of(grantedAuthority));
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, null, List.of(grantedAuthority));
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
 
         filterChain.doFilter(request, response);
-
     }
 }

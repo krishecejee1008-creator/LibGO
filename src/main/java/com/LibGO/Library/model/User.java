@@ -1,14 +1,12 @@
 package com.LibGO.Library.model;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
-public class User{
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,7 +18,12 @@ public class User{
 
     @JsonIgnore
     private String password;
-    public enum UserType{
+
+    // Forgot Password Flow Fields
+    private String resetToken;
+    private LocalDateTime resetTokenExpiry;
+
+    public enum UserType {
         STUDENT,
         FACULTY,
         STAFF,
@@ -28,7 +31,8 @@ public class User{
     }
 
     private Long jeeApplicationNumber;
-    public enum Branch{
+
+    public enum Branch {
         CSE,
         IT,
         ECE,
@@ -42,10 +46,12 @@ public class User{
     @Enumerated(EnumType.STRING)
     private Branch branch;
     private Boolean isNewAdmission;
+
     @Enumerated(EnumType.STRING)
     private UserType userType;
     private LocalDateTime joinedAt;
 
+    // Existing Getters and Setters
     public void setId(Long id) {
         this.id = id;
     }
@@ -146,5 +152,20 @@ public class User{
         return jeeApplicationNumber;
     }
 
+    // New Getters and Setters for Forgot Password Flow
+    public String getResetToken() {
+        return resetToken;
+    }
 
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getResetTokenExpiry() {
+        return resetTokenExpiry;
+    }
+
+    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
+        this.resetTokenExpiry = resetTokenExpiry;
+    }
 }

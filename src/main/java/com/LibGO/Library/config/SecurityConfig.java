@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +16,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -23,16 +27,28 @@ public class SecurityConfig {
     private JwtFilter jwtFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // 1. Hook up the updated production CORS configuration source
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // 2. Disable CSRF protection since we rely on stateless JWT tokens
                 .csrf(csrf -> csrf.disable())
+
+                // 3. Enforce strictly stateless session management
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 4. Set up Role-Based Access Control and public whitelists
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/login").permitAll()
                         .requestMatchers("/books").permitAll()
-                        .requestMatchers("/password/**").permitAll()
+                        .requestMatchers("/password/**").permitAll() // Password pipeline open to public requests
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .anyRequest().authenticated()).addFilterBefore(jwtFilter , UsernamePasswordAuthenticationFilter.class);
+                        .anyRequest().authenticated())
+
+                // 5. Place the JWT authentication filter before the standard login filter
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -44,9 +60,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern("*");
-        configuration.addAllowedMethod("*");
-        configuration.addAllowedHeader("*");
+
+        // Added your live Vercel frontend URL to prevent cross-origin tracking browser blocks
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:3000",
+                "https://lib-go-frontend.vercel.app"
+        ));
+
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -60,5 +83,4 @@ public class SecurityConfig {
             throw new UsernameNotFoundException("Use JWT authentication");
         };
     }
-
 }
