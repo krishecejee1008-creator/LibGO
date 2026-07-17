@@ -4,32 +4,36 @@ import com.LibGO.Library.exception.LibGOException;
 import com.LibGO.Library.exception.UserNotAvailableException;
 import com.LibGO.Library.model.User;
 import com.LibGO.Library.repository.UserRepository;
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-
 @Service
 public class UserService {
 
-    @Value("${spring.mail.username}")
-    private String mailSenderAddress;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    @Value("${resend.api.key}")
+    private String resendApiKey;
+
+    @Value("${libgo.app.url}")
+    private String appUrl;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JavaMailSender mailSender;
 
     public User registerUser(User user) {
         user.setJoinedAt(LocalDateTime.now());
@@ -79,7 +83,7 @@ public class UserService {
     }
 
     // =========================================================================
-    // FORGOT PASSWORD MECHANICS VIA GMAIL SMTP
+    // FORGOT PASSWORD MECHANICS VIA NATIVE RESEND HTTP API
     // =========================================================================
 
     public boolean processForgotPassword(String email) {
@@ -92,7 +96,7 @@ public class UserService {
         String token = UUID.randomUUID().toString();
 
         user.setResetToken(token);
-        user.setResetTokenExpiry(LocalDateTime.now().plusHours(1)); // Valid for 1 hour
+        user.setResetTokenExpiry(LocalDateTime.now().plusHours(1));
         userRepository.save(user);
 
         sendResetEmail(user.getCollageEmailID(), token);
@@ -100,17 +104,26 @@ public class UserService {
     }
 
     private void sendResetEmail(String recipientEmail, String token) {
-        String resetLink = "http://localhost:8080/password/reset?token=" + token;
+        String resetLink = appUrl + "/password/reset?token=" + token;
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailSenderAddress); // Reverted to match spring.mail.username exactly
-        message.setTo(recipientEmail);
-        message.setSubject("LibGO Library System - Password Reset Request");
-        message.setText("Hello,\n\nYou requested a password reset for your LibGO account.\n"
-                + "Please click the link below to verify your session and set a new password:\n\n"
-                + resetLink + "\n\nThis security link will automatically expire in 1 hour.");
+        // Initialize Resend via HTTP instead of SMTP
+        Resend resend = new Resend(resendApiKey);
 
-        mailSender.send(message);
+        CreateEmailOptions params = CreateEmailOptions.builder()
+                .from("onboarding@resend.dev") // Since you don't have a verified domain yet
+                .to(recipientEmail)            // Sandbox limitations apply locally/prod
+                .subject("LibGO Library System - Password Reset Request")
+                .text("Hello,\n\nYou requested a password reset for your LibGO account.\n"
+                        + "Please click the link below to verify your session and set a new password:\n\n"
+                        + resetLink + "\n\nThis security link will automatically expire in 1 hour.")
+                .build();
+
+        try {
+            resend.emails().send(params);
+        } catch (ResendException e) {
+            // Logs the error gracefully without crashing your core application logic
+            logger.error("Failed to route production password link via Resend API: " + e.getMessage());
+        }
     }
 
     public boolean resetPassword(String token, String newPassword) {
@@ -122,13 +135,10 @@ public class UserService {
         User user = userOptional.get();
 
         if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
-            return false; // Token expired
+            return false;
         }
 
-        // Encrypt password securely using your operational BCrypt encoder
         user.setPassword(passwordEncoder.encode(newPassword));
-
-        // Clear token fields to protect against link re-use vulnerabilities
         user.setResetToken(null);
         user.setResetTokenExpiry(null);
 
