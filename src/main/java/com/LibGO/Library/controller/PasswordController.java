@@ -4,7 +4,7 @@ import com.LibGO.Library.dto.ChangePasswordRequest;
 import com.LibGO.Library.dto.ForgetPassword;
 import com.LibGO.Library.dto.ResetPasswordRequest;
 import com.LibGO.Library.exception.LibGOException;
-import com.LibGO.Library.service.UserService;
+import com.LibGO.Library.service.PasswordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,34 +14,32 @@ import org.springframework.web.bind.annotation.*;
 public class PasswordController {
 
     @Autowired
-    private UserService userService; // Switched to the updated UserService
+    PasswordService passwordService;
 
-    // Retaining your existing change password routing if needed
     @PutMapping("/change")
     public ResponseEntity<?> changePassword(@RequestParam String email, @RequestBody ChangePasswordRequest request){
-        return ResponseEntity.status(501).body("Pass-through to your existing change logic if maintained.");
-    }
-
-    // 1. Request a Reset Link (Triggers Resend SMTP)
-    @PostMapping("/forgot")
-    public ResponseEntity<?> requestReset(@RequestBody ForgetPassword request){
-        boolean linkSent = userService.processForgotPassword(request.getEmail());
-        if (linkSent) {
-            return ResponseEntity.ok("A secure password reset link has been dispatched via Resend SMTP.");
-        } else {
-            return ResponseEntity.badRequest().body("The provided email address does not exist in our records.");
+        try {
+            return ResponseEntity.ok(passwordService.changePassword(email, request));
+        } catch (LibGOException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    // 2. Submit New Password using the Token
+    @PostMapping("/forgot")
+    public ResponseEntity<?> requestReset(@RequestBody ForgetPassword request){
+        try {
+            return ResponseEntity.ok(passwordService.sendOtp(request.getEmail()));
+        } catch (LibGOException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/reset")
-    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestBody ResetPasswordRequest request){
-        // Assuming request.getNewPassword() matches your ResetPasswordRequest DTO structure
-        boolean resetSuccessful = userService.resetPassword(token, request.getNewPassword());
-        if (resetSuccessful) {
-            return ResponseEntity.ok("Your password has been successfully updated.");
-        } else {
-            return ResponseEntity.badRequest().body("The reset token is either invalid or has expired.");
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request){
+        try {
+            return ResponseEntity.ok(passwordService.resetPassword(request));
+        } catch (LibGOException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

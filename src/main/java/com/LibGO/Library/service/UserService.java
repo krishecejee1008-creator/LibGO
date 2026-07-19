@@ -4,30 +4,15 @@ import com.LibGO.Library.exception.LibGOException;
 import com.LibGO.Library.exception.UserNotAvailableException;
 import com.LibGO.Library.model.User;
 import com.LibGO.Library.repository.UserRepository;
-import com.resend.Resend;
-import com.resend.core.exception.ResendException;
-import com.resend.services.emails.model.CreateEmailOptions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class UserService {
-
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
-    @Value("${resend.api.key}")
-    private String resendApiKey;
-
-    @Value("${libgo.app.url}")
-    private String appUrl;
 
     @Autowired
     private UserRepository userRepository;
@@ -69,80 +54,16 @@ public class UserService {
     }
 
     public User updateUser(Long applicationNumber, String email, Long enrollmentID) throws LibGOException {
-        User user = userRepository.findByJeeApplicationNumber(applicationNumber).orElseThrow(()-> new UserNotAvailableException("User Not Available"));
+        User user = userRepository.findByJeeApplicationNumber(applicationNumber)
+                .orElseThrow(() -> new UserNotAvailableException("User Not Available"));
         user.setCollageEmailID(email);
         user.setEnrollmentID(enrollmentID);
         user.setNewAdmission(false);
         if (user.getFirstName() == null || enrollmentID == null) {
-            throw new LibGOException("Cannot update password: First name or Enrollment ID is missing.");
+            throw new LibGOException("Cannot update: First name or Enrollment ID is missing.");
         }
         String updatePassword = user.getFirstName() + user.getEnrollmentID().toString();
         user.setPassword(passwordEncoder.encode(updatePassword));
-
         return userRepository.save(user);
-    }
-
-    // =========================================================================
-    // FORGOT PASSWORD MECHANICS VIA NATIVE RESEND HTTP API
-    // =========================================================================
-
-    public boolean processForgotPassword(String email) {
-        Optional<User> userOptional = userRepository.findByCollageEmailID(email);
-        if (userOptional.isEmpty()) {
-            return false;
-        }
-
-        User user = userOptional.get();
-        String token = UUID.randomUUID().toString();
-
-        user.setResetToken(token);
-        user.setResetTokenExpiry(LocalDateTime.now().plusHours(1));
-        userRepository.save(user);
-
-        sendResetEmail(user.getCollageEmailID(), token);
-        return true;
-    }
-
-    private void sendResetEmail(String recipientEmail, String token) {
-        String resetLink = appUrl + "/password/reset?token=" + token;
-
-        // Initialize Resend via HTTP instead of SMTP
-        Resend resend = new Resend(resendApiKey);
-
-        CreateEmailOptions params = CreateEmailOptions.builder()
-                .from("onboarding@resend.dev") // Since you don't have a verified domain yet
-                .to(recipientEmail)            // Sandbox limitations apply locally/prod
-                .subject("LibGO Library System - Password Reset Request")
-                .text("Hello,\n\nYou requested a password reset for your LibGO account.\n"
-                        + "Please click the link below to verify your session and set a new password:\n\n"
-                        + resetLink + "\n\nThis security link will automatically expire in 1 hour.")
-                .build();
-
-        try {
-            resend.emails().send(params);
-        } catch (ResendException e) {
-            // Logs the error gracefully without crashing your core application logic
-            logger.error("Failed to route production password link via Resend API: " + e.getMessage());
-        }
-    }
-
-    public boolean resetPassword(String token, String newPassword) {
-        Optional<User> userOptional = userRepository.findByResetToken(token);
-        if (userOptional.isEmpty()) {
-            return false;
-        }
-
-        User user = userOptional.get();
-
-        if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
-            return false;
-        }
-
-        user.setPassword(passwordEncoder.encode(newPassword));
-        user.setResetToken(null);
-        user.setResetTokenExpiry(null);
-
-        userRepository.save(user);
-        return true;
     }
 }

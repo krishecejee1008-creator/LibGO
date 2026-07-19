@@ -8,7 +8,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByCollageEmailID(String email);
     Optional<User> findByEnrollmentID(Long enrollmentID);
     Optional<User> findByJeeApplicationNumber(Long jeeApplicationNumber);
-
-    // New query to look up users by their password reset token
-    Optional<User> findByResetToken(String resetToken);
 }
