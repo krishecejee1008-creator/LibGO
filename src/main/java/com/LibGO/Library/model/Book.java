@@ -25,6 +25,15 @@ public class Book{
         GENERAL
     }
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(columnDefinition = "TEXT")
+    private String authorBio;
+
+    private String authorImageUrl;
+    private String coverImageUrl;
+
     @Enumerated(EnumType.STRING)
    private Genre genre;
    private String author;
@@ -95,4 +104,16 @@ public class Book{
     public LocalDateTime getAddedAt() {
         return addedAt;
     }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getAuthorBio() { return authorBio; }
+    public void setAuthorBio(String authorBio) { this.authorBio = authorBio; }
+
+    public String getAuthorImageUrl() { return authorImageUrl; }
+    public void setAuthorImageUrl(String authorImageUrl) { this.authorImageUrl = authorImageUrl; }
+
+    public String getCoverImageUrl() { return coverImageUrl; }
+    public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
 }

@@ -1,5 +1,7 @@
 package com.LibGO.Library.service;
 
+import com.LibGO.Library.exception.BookNotAvailableException;
+import com.LibGO.Library.exception.LibGOException;
 import com.LibGO.Library.model.Book;
 import com.LibGO.Library.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,26 @@ public class BookService {
 
         return bookRepository.save(book);
 
+    }
+
+    public Book updateBookById(Long id, Book updatedBook) throws LibGOException {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotAvailableException("Book not found"));
+        book.setName(updatedBook.getName());
+        book.setAuthor(updatedBook.getAuthor());
+        book.setDescription(updatedBook.getDescription());
+        book.setAuthorBio(updatedBook.getAuthorBio());
+        book.setAuthorImageUrl(updatedBook.getAuthorImageUrl());
+        book.setCoverImageUrl(updatedBook.getCoverImageUrl());
+        book.setGenre(updatedBook.getGenre());
+        book.setTotalCopies(updatedBook.getTotalCopies());
+        return bookRepository.save(book);
+    }
+
+    public void deleteBook(Long id) throws LibGOException {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotAvailableException("Book not found"));
+        bookRepository.delete(book);
     }
 
 }

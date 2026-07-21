@@ -147,4 +147,24 @@ public class AdminController {
         return userService.getUserByJeeApplicationNumber(jeeApplicationNumber);
     }
 
+    @PutMapping("/books/{id}")
+    public ResponseEntity<?> updateBook(@PathVariable Long id, @RequestBody Book book) {
+        try {
+            Book updated = bookService.updateBookById(id, book);
+            return ResponseEntity.ok(updated);
+        } catch (LibGOException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/books/{id}")
+    public ResponseEntity<?> deleteBook(@PathVariable Long id) {
+        try {
+            bookService.deleteBook(id);
+            return ResponseEntity.ok("Book deleted successfully");
+        } catch (LibGOException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }
