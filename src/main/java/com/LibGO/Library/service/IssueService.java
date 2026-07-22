@@ -18,6 +18,8 @@ import java.util.Optional;
 public class IssueService {
 
     @Autowired
+    private UserService userService;
+    @Autowired
     private CartRepository cartRepository;
     @Autowired
     private IssueRepository issueRepository;
@@ -49,12 +51,12 @@ public class IssueService {
             if (status == Issue.CurrentStatus.PENDING || status == Issue.CurrentStatus.ACTIVE) {
                 throw new BookAlreadyIssuedException("The Book, " + book.getName() + ", is already issued");
             }
-            // Reuse expired/returned issue
+
             issue = existingIssue.get();
             issue.setDueDate(null);
             issue.setCollectedAt(null);
         } else {
-            // Create new issue
+
             issue = new Issue();
             issue.setIssuer(user);
             issue.setBookIssued(book);
@@ -84,6 +86,7 @@ public class IssueService {
         issue.setDueDate(issue.getCollectedAt().plusMonths(3));
         issue.setCurrentStatus(Issue.CurrentStatus.ACTIVE);
 
+        userService.addXP(user, 10);
         return issueRepository.save(issue);
     }
 
@@ -102,6 +105,7 @@ public class IssueService {
         issue.setExtended(true);
         issue.setDueDate(issue.getDueDate().plusMonths(1));
 
+        userService.addXP(user, 15);
         return issueRepository.save(issue);
     }
 
@@ -149,6 +153,14 @@ public class IssueService {
         book.setAvailableCopies(book.getAvailableCopies() + 1);
 
         bookRepository.save(book);
+        long daysRemaining = java.time.temporal.ChronoUnit.DAYS.between(LocalDateTime.now(), issue.getDueDate());
+        int xpEarned;
+        if (daysRemaining > 30) xpEarned = 20;
+        else if (daysRemaining >= 15) xpEarned = 35;
+        else if (daysRemaining >= 7) xpEarned = 50;
+        else if (daysRemaining >= 1) xpEarned = 75;
+        else xpEarned = 100;
+        userService.addXP(user, xpEarned);
         return issueRepository.save(issue);
     }
 

@@ -67,4 +67,11 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile(@RequestParam String email) throws LibGOException {
+        User user = userService.getUserByEmail(email)
+                .orElseThrow(() -> new UserNotAvailableException("User not found"));
+        return ResponseEntity.ok(user);
+    }
+
 }

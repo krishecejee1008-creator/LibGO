@@ -66,4 +66,28 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(updatePassword));
         return userRepository.save(user);
     }
+
+    public void updateLevel(User user) {
+        int xp = user.getExpPoints();
+        User.Level newLevel;
+
+        if (xp >= 27500) newLevel = User.Level.LIBRARIAN_SUPREME;
+        else if (xp >= 20000) newLevel = User.Level.GRAND_SCHOLAR;
+        else if (xp >= 15000) newLevel = User.Level.LUMINARY;
+        else if (xp >= 11000) newLevel = User.Level.SAGE;
+        else if (xp >= 7500) newLevel = User.Level.ARCHIVIST;
+        else if (xp >= 5000) newLevel = User.Level.BIBLIOPHILE;
+        else if (xp >= 3000) newLevel = User.Level.SCHOLAR;
+        else if (xp >= 1500) newLevel = User.Level.AVID_READER;
+        else if (xp >= 500) newLevel = User.Level.BOOKWORM;
+        else newLevel = User.Level.PAGE_TURNER;
+
+        user.setLevel(newLevel);
+        userRepository.save(user);
+    }
+
+    public void addXP(User user, int points) {
+        user.setExpPoints(user.getExpPoints() + points);
+        updateLevel(user);
+    }
 }

@@ -16,6 +16,24 @@ public class User {
     private String lastName;
     private Boolean isActive;
 
+    private Integer expPoints = 0;
+
+    public enum Level {
+        PAGE_TURNER,
+        BOOKWORM,
+        AVID_READER,
+        SCHOLAR,
+        BIBLIOPHILE,
+        ARCHIVIST,
+        SAGE,
+        LUMINARY,
+        GRAND_SCHOLAR,
+        LIBRARIAN_SUPREME
+    }
+
+    @Enumerated(EnumType.STRING)
+    private Level level = Level.PAGE_TURNER;
+
     @JsonIgnore
     private String password;
 
@@ -147,4 +165,10 @@ public class User {
     public Long getJeeApplicationNumber() {
         return jeeApplicationNumber;
     }
+
+    public Integer getExpPoints() { return expPoints; }
+    public void setExpPoints(Integer expPoints) { this.expPoints = expPoints; }
+
+    public Level getLevel() { return level; }
+    public void setLevel(Level level) { this.level = level; }
 }
