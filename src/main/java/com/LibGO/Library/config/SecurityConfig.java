@@ -29,16 +29,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Hook up the updated production CORS configuration source
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // 2. Disable CSRF protection since we rely on stateless JWT tokens
                 .csrf(csrf -> csrf.disable())
 
-                // 3. Enforce strictly stateless session management
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 4. Set up Role-Based Access Control and public whitelists
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/login").permitAll()
                         .requestMatchers("/books").permitAll()
@@ -46,7 +42,6 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
 
-                // 5. Place the JWT authentication filter before the standard login filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -61,7 +56,6 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Added your live Vercel frontend URL to prevent cross-origin tracking browser blocks
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "https://lib-go-frontend.vercel.app"

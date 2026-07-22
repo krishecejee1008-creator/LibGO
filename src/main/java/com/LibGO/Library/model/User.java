@@ -19,10 +19,6 @@ public class User {
     @JsonIgnore
     private String password;
 
-    // Forgot Password Flow Fields
-    private String resetToken;
-    private LocalDateTime resetTokenExpiry;
-
     public enum UserType {
         STUDENT,
         FACULTY,
@@ -150,22 +146,5 @@ public class User {
 
     public Long getJeeApplicationNumber() {
         return jeeApplicationNumber;
-    }
-
-    // New Getters and Setters for Forgot Password Flow
-    public String getResetToken() {
-        return resetToken;
-    }
-
-    public void setResetToken(String resetToken) {
-        this.resetToken = resetToken;
-    }
-
-    public LocalDateTime getResetTokenExpiry() {
-        return resetTokenExpiry;
-    }
-
-    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
-        this.resetTokenExpiry = resetTokenExpiry;
     }
 }

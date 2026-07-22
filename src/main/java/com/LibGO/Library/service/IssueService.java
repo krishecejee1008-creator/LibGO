@@ -5,6 +5,7 @@ import com.LibGO.Library.model.Book;
 import com.LibGO.Library.model.Issue;
 import com.LibGO.Library.model.User;
 import com.LibGO.Library.repository.BookRepository;
+import com.LibGO.Library.repository.CartRepository;
 import com.LibGO.Library.repository.IssueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ import java.util.Optional;
 @Service
 public class IssueService {
 
+    @Autowired
+    private CartRepository cartRepository;
     @Autowired
     private IssueRepository issueRepository;
     @Autowired
@@ -64,6 +67,8 @@ public class IssueService {
 
         book.setAvailableCopies(book.getAvailableCopies() - 1);
         bookRepository.save(book);
+        cartRepository.findByCartOwnerAndCartBook(user, book)
+                .ifPresent(cart -> cartRepository.delete(cart));
         return issueRepository.save(issue);
     }
 
@@ -148,4 +153,3 @@ public class IssueService {
     }
 
 }
-
