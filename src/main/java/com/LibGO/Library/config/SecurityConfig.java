@@ -38,8 +38,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/login").permitAll()
                         .requestMatchers("/books").permitAll()
-                        .requestMatchers("/password/**").permitAll() // Password pipeline open to public requests
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/password/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

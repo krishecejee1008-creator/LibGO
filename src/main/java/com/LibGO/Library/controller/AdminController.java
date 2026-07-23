@@ -167,4 +167,18 @@ public class AdminController {
         }
     }
 
+    @PutMapping("/issues/collect")
+    public ResponseEntity<?> collectIssue(@RequestBody IssueRequest request) {
+        try {
+            User user = userService.getUserById(request.getUserId())
+                    .orElseThrow(() -> new UserNotAvailableException("Invalid UserID"));
+            Book book = bookService.getBookById(request.getBookId())
+                    .orElseThrow(() -> new BookNotAvailableException("Invalid BookID"));
+            Issue issue = issueService.collectBook(user, book);
+            return ResponseEntity.ok(issue);
+        } catch (LibGOException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

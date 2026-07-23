@@ -16,5 +16,5 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
     List<Issue> findIssueByIssuer(User issuer);
 
-    User findIssueById(long id);
+    List<Issue> findByBookIssued(Book bookIssued);
 }

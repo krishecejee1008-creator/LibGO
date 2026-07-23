@@ -3,7 +3,11 @@ package com.LibGO.Library.service;
 import com.LibGO.Library.exception.BookNotAvailableException;
 import com.LibGO.Library.exception.LibGOException;
 import com.LibGO.Library.model.Book;
+import com.LibGO.Library.model.Cart;
+import com.LibGO.Library.model.Issue;
 import com.LibGO.Library.repository.BookRepository;
+import com.LibGO.Library.repository.CartRepository;
+import com.LibGO.Library.repository.IssueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +17,12 @@ import java.util.Optional;
 
 @Service
 public class BookService {
+
+    @Autowired
+    private IssueRepository issueRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
 
     @Autowired
     private BookRepository bookRepository;
@@ -77,6 +87,13 @@ public class BookService {
     public void deleteBook(Long id) throws LibGOException {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotAvailableException("Book not found"));
+
+        List<Issue> issues = issueRepository.findByBookIssued(book);
+        issueRepository.deleteAll(issues);
+
+        List<Cart> carts = cartRepository.findByCartBook(book);
+        cartRepository.deleteAll(carts);
+
         bookRepository.delete(book);
     }
 

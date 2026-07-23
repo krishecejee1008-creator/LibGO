@@ -12,4 +12,6 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     List<Cart> findByCartOwner(User user);
     Optional<Cart> findByCartOwnerAndCartBook(User user, Book book);
     int countByCartOwner(User user);
+
+    List<Cart> findByCartBook(Book cartBook);
 }
